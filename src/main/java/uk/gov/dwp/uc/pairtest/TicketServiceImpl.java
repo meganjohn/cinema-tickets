@@ -5,9 +5,10 @@ import thirdparty.paymentgateway.TicketPaymentServiceImpl;
 import thirdparty.seatbooking.SeatReservationService;
 import uk.gov.dwp.uc.pairtest.domain.TicketBasket;
 import uk.gov.dwp.uc.pairtest.domain.TicketPurchaseRequest;
+import uk.gov.dwp.uc.pairtest.domain.TicketRequest;
+import uk.gov.dwp.uc.pairtest.domain.BasketCost;
 import uk.gov.dwp.uc.pairtest.exception.InvalidPurchaseException;
 
-import static uk.gov.dwp.uc.pairtest.domain.calculators.RequestCost.calculatePrice;
 import static uk.gov.dwp.uc.pairtest.validation.TicketPurchaseRequestValidator.validateTicketPurchaseRequest;
 
 
@@ -28,12 +29,14 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void purchaseTickets(TicketPurchaseRequest ticketPurchaseRequest) throws InvalidPurchaseException {
 
-        TicketBasket ticketBasket = new TicketBasket().buildBasket(ticketPurchaseRequest);
+        TicketBasket ticketBasket = new TicketBasket(ticketPurchaseRequest);
 
         validateTicketPurchaseRequest(ticketBasket, ticketPurchaseRequest.getAccountId());
 
-        paymentService.makePayment(ticketPurchaseRequest.getAccountId(), calculatePrice(ticketBasket));
+        BasketCost basketCost = new BasketCost();
+        paymentService.makePayment(ticketPurchaseRequest.getAccountId(), basketCost.calculatePrice(ticketBasket));
 
-        seatReservationService.reserveSeat(ticketPurchaseRequest.getAccountId(), ticketBasket.getAdultTickets() + ticketBasket.getChildTickets());
+        seatReservationService.reserveSeat(ticketPurchaseRequest.getAccountId(),
+                ticketBasket.getTicketsForType(TicketRequest.Type.ADULT) + ticketBasket.getTicketsForType(TicketRequest.Type.CHILD));
     }
 }

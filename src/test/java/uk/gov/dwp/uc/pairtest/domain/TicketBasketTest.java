@@ -16,11 +16,12 @@ public class TicketBasketTest {
         TicketRequest[] ticketRequests = new TicketRequest[]{ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
 
-        TicketBasket basket = new TicketBasket().buildBasket(ticketPurchaseRequest);
+        TicketBasket basket = new TicketBasket(ticketPurchaseRequest);
 
-        assertEquals(basket.getAdultTickets(), 6);
-        assertEquals(basket.getChildTickets(), 5);
-        assertEquals(basket.getInfantTickets(), 4);
+        assertEquals(basket.getTicketsForType(TicketRequest.Type.ADULT), 6);
+        assertEquals(basket.getTicketsForType(TicketRequest.Type.CHILD), 5);
+        assertEquals(basket.getTicketsForType(TicketRequest.Type.INFANT), 4);
+        assertEquals(basket.getTotalTickets(), 15);
     }
 
     @Test
@@ -28,10 +29,11 @@ public class TicketBasketTest {
         TicketRequest[] ticketRequests = new TicketRequest[]{ADULT_TICKET_REQUEST, ADULT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
 
-        TicketBasket basket = new TicketBasket().buildBasket(ticketPurchaseRequest);
+        TicketBasket basket = new TicketBasket(ticketPurchaseRequest);
 
-        assertEquals(basket.getAdultTickets(), 12);
-        assertEquals(basket.getChildTickets(), 0);
-        assertEquals(basket.getInfantTickets(), 0);
+        assertEquals(basket.getTicketsForType(TicketRequest.Type.ADULT), 12);
+        assertEquals(basket.getTicketsForType(TicketRequest.Type.CHILD), 0);
+        assertEquals(basket.getTicketsForType(TicketRequest.Type.INFANT), 0);
+        assertEquals(basket.getTotalTickets(), 12);
     }
 }

@@ -107,7 +107,7 @@ public class TicketServiceTest {
         Exception exception = assertThrows(InvalidPurchaseException.class, () -> ticketService.purchaseTickets(ticketPurchaseRequest));
 
         // then
-        assertTrue(exception.getMessage().contentEquals("Invalid quantity of tickets requested."));
+        assertTrue(exception.getMessage().contentEquals("Invalid quantity of tickets requested. Requested: 23. Max permitted per request: 20"));
         verifyNoInteractions(paymentService);
         verifyNoInteractions(reservationService);
     }
@@ -125,7 +125,7 @@ public class TicketServiceTest {
         Exception exception = assertThrows(InvalidPurchaseException.class, () -> ticketService.purchaseTickets(ticketPurchaseRequest));
 
         // then
-        assertTrue(exception.getMessage().contentEquals("Invalid account ID provided."));
+        assertTrue(exception.getMessage().contentEquals("Invalid account ID provided. Account ID: 0"));
         verifyNoInteractions(paymentService);
         verifyNoInteractions(reservationService);
     }

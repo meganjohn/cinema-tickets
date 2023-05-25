@@ -1,69 +1,46 @@
 package uk.gov.dwp.uc.pairtest.domain;
 
-public final class TicketBasket {
+import java.util.EnumMap;
 
-    private Integer adultTickets;
-    private Integer childTickets;
-    private Integer infantTickets;
+public class TicketBasket {
+
+    EnumMap<TicketRequest.Type, Integer> basket;
 
     public TicketBasket() {
-        adultTickets = childTickets = infantTickets = 0;
+        this.basket = new EnumMap<>(TicketRequest.Type.class);
     }
 
-    public TicketBasket(Integer adultTickets, Integer childTickets, Integer infantTickets) {
-        this.adultTickets = adultTickets;
-        this.childTickets = childTickets;
-        this.infantTickets = infantTickets;
-    }
-
-    public Integer getAdultTickets() {
-        return adultTickets;
-    }
-
-    public Integer getChildTickets() {
-        return childTickets;
-    }
-
-    public Integer getInfantTickets() {
-        return infantTickets;
-    }
-
-    public void setAdultTickets(Integer noOfTickets) {
-        this.adultTickets = noOfTickets;
-    }
-
-    public void setChildTickets(Integer noOfTickets) {
-        this.childTickets = noOfTickets;
-    }
-
-    public void setInfantTickets(Integer noOfTickets) {
-        this.infantTickets = noOfTickets;
-    }
-
-    public void addAdultTickets(Integer noOfTickets) {
-        this.adultTickets = getAdultTickets() + noOfTickets;
-    }
-
-    public void addChildTickets(Integer noOfTickets) {
-        this.childTickets = getChildTickets() + noOfTickets;
-    }
-
-    public void addInfantTickets(Integer noOfTickets) {
-        this.infantTickets = getInfantTickets() + noOfTickets;
-    }
-
-    public TicketBasket buildBasket(TicketPurchaseRequest purchaseRequest) {
-        TicketBasket basket = new TicketBasket();
+    public TicketBasket(TicketPurchaseRequest purchaseRequest) {
+        this.basket = new EnumMap<>(TicketRequest.Type.class);
 
         for (TicketRequest request : purchaseRequest.getTicketTypeRequests()
         ) {
-            switch (request.getTicketType()) {
-                case ADULT -> basket.addAdultTickets(request.getNoOfTickets());
-                case CHILD -> basket.addChildTickets(request.getNoOfTickets());
-                case INFANT -> basket.addInfantTickets(request.getNoOfTickets());
-            }
+            addTicketsToBasket(request.getTicketType(), request.getNoOfTickets());
         }
+    }
 
+    public EnumMap<TicketRequest.Type, Integer> getBasket() {
         return basket;
+    }
+
+    public Integer getTicketsForType(TicketRequest.Type type) {
+        return basket.getOrDefault(type, 0);
+    }
+
+    public void setBasket(EnumMap<TicketRequest.Type, Integer> ticketBasket) {
+        basket = ticketBasket;
+    }
+
+    public void addTicketsToBasket(TicketRequest.Type type, Integer noOfTickets) {
+        Integer currentTicketsForType = getTicketsForType(type);
+        basket.put(type, currentTicketsForType + noOfTickets);
+    }
+
+    public Integer getTotalTickets() {
+        int totalTickets = 0;
+        for (TicketRequest.Type type : TicketRequest.Type.values()) {
+            totalTickets = totalTickets + basket.getOrDefault(type, 0);
+        }
+        return totalTickets;
     }
 }

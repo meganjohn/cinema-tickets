@@ -2,31 +2,37 @@ package uk.gov.dwp.uc.pairtest.validation;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.dwp.uc.pairtest.domain.TicketBasket;
+import uk.gov.dwp.uc.pairtest.domain.TicketRequest;
 import uk.gov.dwp.uc.pairtest.exception.InsufficientAdultTicketsRequestedException;
-import uk.gov.dwp.uc.pairtest.exception.InvalidAccountNumberException;
+import uk.gov.dwp.uc.pairtest.exception.InvalidAccountIdException;
 import uk.gov.dwp.uc.pairtest.exception.InvalidTicketQuantityException;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static uk.gov.dwp.uc.pairtest.validation.AccountNumberIsValid.accountNumberIsValid;
+import static uk.gov.dwp.uc.pairtest.validation.AccountIdIsValid.AccountIdIsValid;
 import static uk.gov.dwp.uc.pairtest.validation.AdultTicketsRequestedIsValid.adultTicketsRequestedIsValid;
 import static uk.gov.dwp.uc.pairtest.validation.TicketNumberIsValid.ticketQuantityIsValid;
 
 public class ValidationTest {
 
+    private static final Integer MAX_TICKETS = 20;
+
     @Test
-    void validAccountNumber() {
-        assertDoesNotThrow(() -> accountNumberIsValid(12345L));
+    void validAccountId() {
+        assertDoesNotThrow(() -> AccountIdIsValid(12345L));
     }
 
     @Test
-    void invalidAccountNumber_Zero() {
-        assertThrows(InvalidAccountNumberException.class, () -> accountNumberIsValid(0L));
+    void invalidAccountId_Zero() {
+        assertThrows(InvalidAccountIdException.class, () -> AccountIdIsValid(0L));
     }
 
     @Test
-    void invalidAccountNumber_Negative() {
-        assertThrows(InvalidAccountNumberException.class, () -> accountNumberIsValid(-10L));
+    void invalidAccountId_Negative() {
+        assertThrows(InvalidAccountIdException.class, () -> AccountIdIsValid(-10L));
     }
 
     @Test
@@ -34,76 +40,132 @@ public class ValidationTest {
         Integer ADULT_TICKETS = 4;
         Integer CHILD_TICKETS = 3;
         Integer INFANT_TICKETS = 2;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS,
+                        TicketRequest.Type.CHILD, CHILD_TICKETS,
+                        TicketRequest.Type.INFANT, INFANT_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
-        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(new TicketBasket(ADULT_TICKETS, CHILD_TICKETS, INFANT_TICKETS)));
+        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(basket));
     }
 
     @Test
     void validAdultTickets_NoChildNoInfant() {
         Integer ADULT_TICKETS = 2;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
-        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(new TicketBasket(ADULT_TICKETS, 0, 0)));
+        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(basket));
     }
 
     @Test
     void validAdultTickets_MoreChildThanAdult() {
         Integer ADULT_TICKETS = 2;
         Integer CHILD_TICKETS = 4;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS,
+                        TicketRequest.Type.CHILD, CHILD_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
-        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(new TicketBasket(ADULT_TICKETS, CHILD_TICKETS, 0)));
+        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(basket));
     }
 
     @Test
     void validAdultTickets_InfantNoChild() {
         Integer ADULT_TICKETS = 4;
         Integer INFANT_TICKETS = 2;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS,
+                        TicketRequest.Type.INFANT, INFANT_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
-        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(new TicketBasket(ADULT_TICKETS, 0, INFANT_TICKETS)));
+        assertDoesNotThrow(() -> adultTicketsRequestedIsValid(basket));
     }
 
     @Test
     void invalidAdultTickets_MoreInfantThanAdult() {
         Integer ADULT_TICKETS = 4;
         Integer INFANT_TICKETS = 6;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS,
+                        TicketRequest.Type.INFANT, INFANT_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
         assertThrows(InsufficientAdultTicketsRequestedException.class,
-                () -> adultTicketsRequestedIsValid(new TicketBasket(ADULT_TICKETS, 0, INFANT_TICKETS)));
+                () -> adultTicketsRequestedIsValid(basket));
     }
 
     @Test
     void invalidAdultTickets_ChildNoAdults() {
         Integer CHILD_TICKETS = 6;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.CHILD, CHILD_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
         assertThrows(InsufficientAdultTicketsRequestedException.class,
-                () -> adultTicketsRequestedIsValid(new TicketBasket(0, CHILD_TICKETS, 0)));
+                () -> adultTicketsRequestedIsValid(basket));
     }
 
     @Test
-    void validNumberOfTickets_FewerThan20() {
+    void validNumberOfTickets_FewerThanMaxTickets() {
         Integer ADULT_TICKETS = 4;
         Integer CHILD_TICKETS = 3;
         Integer INFANT_TICKETS = 2;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS,
+                        TicketRequest.Type.CHILD, CHILD_TICKETS,
+                        TicketRequest.Type.INFANT, INFANT_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
-        assertDoesNotThrow(() -> ticketQuantityIsValid(new TicketBasket(ADULT_TICKETS, CHILD_TICKETS, INFANT_TICKETS), 20));
+        assertDoesNotThrow(() -> ticketQuantityIsValid(basket, MAX_TICKETS));
     }
 
     @Test
-    void validNumberOfTickets_Exactly20() {
+    void validNumberOfTickets_ExactlyMaxTickets() {
         Integer ADULT_TICKETS = 15;
         Integer CHILD_TICKETS = 3;
         Integer INFANT_TICKETS = 2;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS,
+                        TicketRequest.Type.CHILD, CHILD_TICKETS,
+                        TicketRequest.Type.INFANT, INFANT_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
-        assertDoesNotThrow(() -> ticketQuantityIsValid(new TicketBasket(ADULT_TICKETS, CHILD_TICKETS, INFANT_TICKETS), 20));
+        assertDoesNotThrow(() -> ticketQuantityIsValid(basket, MAX_TICKETS));
     }
 
     @Test
-    void invalidNumberOfTickets_MoreThan20() {
+    void invalidNumberOfTickets_MoreThanMaxTickets() {
         Integer ADULT_TICKETS = 15;
         Integer CHILD_TICKETS = 5;
         Integer INFANT_TICKETS = 10;
+        EnumMap<TicketRequest.Type, Integer> basketMap = new EnumMap<>(
+                Map.of(
+                        TicketRequest.Type.ADULT, ADULT_TICKETS,
+                        TicketRequest.Type.CHILD, CHILD_TICKETS,
+                        TicketRequest.Type.INFANT, INFANT_TICKETS));
+        final TicketBasket basket = new TicketBasket();
+        basket.setBasket(basketMap);
 
         assertThrows(InvalidTicketQuantityException.class,
-                () -> ticketQuantityIsValid(new TicketBasket(ADULT_TICKETS, CHILD_TICKETS, INFANT_TICKETS), 20));
+                () -> ticketQuantityIsValid(basket, MAX_TICKETS));
     }
 
 }
