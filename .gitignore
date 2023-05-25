@@ -7,6 +7,10 @@
 /dataSources/
 /dataSources.local.xml
 # IDE
-.idea/
+.idea/**
 # Mac file
 .DS_Store
+# .gitkeep
+**/.gitkeep
+# maven build
+**/target/**
