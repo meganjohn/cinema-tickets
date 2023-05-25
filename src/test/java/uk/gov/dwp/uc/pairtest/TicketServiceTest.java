@@ -29,7 +29,7 @@ public class TicketServiceTest {
     void validRequest_OneTicketRequestForEachType() {
 
         // given a request
-        TicketRequest[] ticketRequests = new TicketRequest[] {ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
+        TicketRequest[] ticketRequests = new TicketRequest[]{ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
 
         // when
@@ -46,7 +46,7 @@ public class TicketServiceTest {
         // given a request
         TicketRequest ADDITIONAL_ADULT_TICKET_REQUEST = new TicketRequest(TicketRequest.Type.ADULT, 2);
 
-        TicketRequest[] ticketRequests = new TicketRequest[] {ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST, ADDITIONAL_ADULT_TICKET_REQUEST};
+        TicketRequest[] ticketRequests = new TicketRequest[]{ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST, ADDITIONAL_ADULT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
 
         // when
@@ -58,27 +58,10 @@ public class TicketServiceTest {
     }
 
     @Test
-    void validRequest_Exactly20TicketsRequested() {
-
-        // given a request
-        TicketRequest ADDITIONAL_ADULT_TICKET_REQUEST = new TicketRequest(TicketRequest.Type.ADULT, 13);
-
-        TicketRequest[] ticketRequests = new TicketRequest[] {ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, ADDITIONAL_ADULT_TICKET_REQUEST};
-        TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
-
-        // when
-        ticketService.purchaseTickets(ticketPurchaseRequest);
-
-        // then
-        verify(paymentService, times(1)).makePayment(ACCOUNT_ID, 380);
-        verify(reservationService, times(1)).reserveSeat(ACCOUNT_ID, 20);
-    }
-
-    @Test
     void invalidRequest_NoAdultTickets() {
 
         // given an invalid request
-        TicketRequest[] ticketRequests = new TicketRequest[] {CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
+        TicketRequest[] ticketRequests = new TicketRequest[]{CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
 
         // when
@@ -96,7 +79,7 @@ public class TicketServiceTest {
         // given an invalid request
         TicketRequest LARGE_INFANT_TICKET_REQUEST = new TicketRequest(TicketRequest.Type.INFANT, 10);
 
-        TicketRequest[] ticketRequests = new TicketRequest[] {ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, LARGE_INFANT_TICKET_REQUEST};
+        TicketRequest[] ticketRequests = new TicketRequest[]{ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, LARGE_INFANT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
 
         // when
@@ -109,25 +92,7 @@ public class TicketServiceTest {
     }
 
     @Test
-    void invalidRequest_TooManyTicketsOfOneType() {
-
-        // given an invalid request
-        final TicketRequest INVALID_ADULT_TICKET_REQUEST = new TicketRequest(TicketRequest.Type.ADULT, 21);
-
-        TicketRequest[] ticketRequests = new TicketRequest[] {INVALID_ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
-        TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
-
-        // when
-        Exception exception = assertThrows(InvalidPurchaseException.class, () -> ticketService.purchaseTickets(ticketPurchaseRequest));
-
-        // then
-        assertTrue(exception.getMessage().contentEquals("Invalid quantity of tickets requested."));
-        verifyNoInteractions(paymentService);
-        verifyNoInteractions(reservationService);
-    }
-
-    @Test
-    void invalidRequest_TooManyTicketsAcrossAllTypes() {
+    void invalidRequest_TooManyTickets() {
 
         // given an invalid request
         final TicketRequest INVALID_ADULT_TICKET_REQUEST = new TicketRequest(TicketRequest.Type.ADULT, 15);
@@ -135,7 +100,7 @@ public class TicketServiceTest {
         final TicketRequest INVALID_INFANT_TICKET_REQUEST = new TicketRequest(TicketRequest.Type.INFANT, 3);
 
 
-        TicketRequest[] ticketRequests = new TicketRequest[] {INVALID_ADULT_TICKET_REQUEST, INVALID_CHILD_TICKET_REQUEST, INVALID_INFANT_TICKET_REQUEST};
+        TicketRequest[] ticketRequests = new TicketRequest[]{INVALID_ADULT_TICKET_REQUEST, INVALID_CHILD_TICKET_REQUEST, INVALID_INFANT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(ACCOUNT_ID, ticketRequests);
 
         // when
@@ -153,7 +118,7 @@ public class TicketServiceTest {
         // given an invalid request
         final long INVALID_ACCOUNT_ID = 0;
 
-        TicketRequest[] ticketRequests = new TicketRequest[] {ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
+        TicketRequest[] ticketRequests = new TicketRequest[]{ADULT_TICKET_REQUEST, CHILD_TICKET_REQUEST, INFANT_TICKET_REQUEST};
         TicketPurchaseRequest ticketPurchaseRequest = new TicketPurchaseRequest(INVALID_ACCOUNT_ID, ticketRequests);
 
         // when

@@ -1,20 +1,18 @@
 package uk.gov.dwp.uc.pairtest.validation;
 
-import uk.gov.dwp.uc.pairtest.domain.TicketRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import uk.gov.dwp.uc.pairtest.domain.TicketBasket;
+import uk.gov.dwp.uc.pairtest.exception.InsufficientAdultTicketsRequestedException;
 
 public class AdultTicketsRequestedIsValid {
 
-    public static boolean adultTicketsRequestedIsValid(TicketRequest[] ticketRequests) {
-        int numberOfInfantTickets = 0;
-        int numberOfAdultTickets = 0;
-        for(TicketRequest ticketRequest : ticketRequests) {
-            if (ticketRequest.getTicketType().equals(TicketRequest.Type.INFANT)) {
-                numberOfInfantTickets = numberOfInfantTickets + ticketRequest.getNoOfTickets();
-            }
-            if (ticketRequest.getTicketType().equals(TicketRequest.Type.ADULT)) {
-                numberOfAdultTickets = numberOfAdultTickets + ticketRequest.getNoOfTickets();
-            }
+    private static final Logger LOGGER = LogManager.getLogger(AdultTicketsRequestedIsValid.class);
+
+    public static void adultTicketsRequestedIsValid(TicketBasket ticketBasket) {
+        if (ticketBasket.getAdultTickets() < 1 || ticketBasket.getAdultTickets() < ticketBasket.getInfantTickets()) {
+            LOGGER.error("Not enough adult tickets requested. An adult ticket must be purchased with every infant ticket, or at least one if purchasing child tickets.");
+            throw new InsufficientAdultTicketsRequestedException("Insufficient adult tickets requested.");
         }
-        return numberOfAdultTickets >= numberOfInfantTickets;
     }
 }

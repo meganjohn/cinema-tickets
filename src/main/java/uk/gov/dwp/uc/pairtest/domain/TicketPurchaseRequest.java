@@ -5,8 +5,8 @@ package uk.gov.dwp.uc.pairtest.domain;
  */
 public class TicketPurchaseRequest {
 
-    private long accountId;
-    private TicketRequest[] ticketRequests;
+    private final long accountId;
+    private final TicketRequest[] ticketRequests;
 
     public TicketPurchaseRequest(long accountId, TicketRequest[] ticketRequests) {
         this.accountId = accountId;
